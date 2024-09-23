@@ -2,18 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
 func defaultFunc(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if r.URL.Path == "/" {
-		fmt.Fprint(w, "<h1>Hello, 部署热更新！</h1>")
-	} else {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "<h1>请求页面未找到 :(</h1>"+
-			"<p>如有疑惑，请联系我们。</p>")
-	}
+	fmt.Fprint(w, "<h1>Hello, 默认页面！</h1>")
 }
 
 func aboutFunc(w http.ResponseWriter, r *http.Request) {
@@ -22,16 +17,39 @@ func aboutFunc(w http.ResponseWriter, r *http.Request) {
 		"<a href=\"mailto:shucanwu@163.com\">shucanwu@163.com</a>")
 }
 
-func contactFunc(w http.ResponseWriter, r *http.Request) {
+func articlesShowHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "123")
+	vars := mux.Vars(r)
+	id := vars["id"]
+	fmt.Fprint(w, "文章 ID："+id)
+}
+
+func articlesIndexHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, "访问文章列表")
+}
+
+func articlesStoreHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, "创建新的文章")
+}
+
+func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusNotFound)
+	fmt.Fprint(w, "<h1>请求页面未找到 :(</h1><p>如有疑惑，请联系我们。</p>")
 }
 
 func main() {
-	router := http.NewServeMux()
-	router.HandleFunc("/", defaultFunc)
-	router.HandleFunc("/about", aboutFunc)
-	router.HandleFunc("/contact", contactFunc)
+	router := mux.NewRouter()
+	router.HandleFunc("/", defaultFunc).Methods("GET").Name("default")
+	router.HandleFunc("/about", aboutFunc).Methods("GET").Name("about")
+
+	router.HandleFunc("/articles/{id:[0-9]+}", articlesShowHandler).Methods("GET").Name("articles.show")
+	router.HandleFunc("/articles", articlesIndexHandler).Methods("GET").Name("articles.index")
+	router.HandleFunc("/articles", articlesStoreHandler).Methods("GET").Name("articles.store")
+
+	router.NotFoundHandler = http.HandlerFunc(notFoundHandler)
 
 	http.ListenAndServe(":3000", router)
 }
