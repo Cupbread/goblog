@@ -162,10 +162,20 @@ func initDB() {
 	checkError(err)
 }
 
+func createTables() {
+	createArticlesSQL := `CREATE TABLE IF NOT EXISTS articles(
+    id bigint(20) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    body longtext COLLATE utf8mb4_unicode_ci
+); `
+	_, err := db.Exec(createArticlesSQL)
+	checkError(err)
+}
+
 func main() {
 
 	initDB()
-
+	createTables()
 	router.HandleFunc("/", defaultFunc).Methods("GET").Name("default")
 	router.HandleFunc("/about", aboutFunc).Methods("GET").Name("about")
 
