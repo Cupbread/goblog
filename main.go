@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+var router = mux.NewRouter()
+
 func defaultFunc(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "<h1>Hello, 默认页面！</h1>")
 }
@@ -28,6 +30,26 @@ func articlesIndexHandler(w http.ResponseWriter, r *http.Request) {
 
 func articlesStoreHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "创建新的文章")
+}
+
+func articlesCreateHandler(w http.ResponseWriter, r *http.Request) {
+	html := `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>创建文章 —— 我的技术博客</title>
+</head>
+<body>
+    <form action="%s" method="post">
+        <p><input type="text" name="title"></p>
+        <p><textarea name="body" cols="30" rows="10"></textarea></p>
+        <p><button type="submit">提交</button></p>
+    </form>
+</body>
+</html>
+`
+	storeURL, _ := router.Get("articles.create").URL()
+	fmt.Fprintf(w, html, storeURL)
 }
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,13 +74,14 @@ func removeTrailingSlash(next http.Handler) http.Handler {
 }
 
 func main() {
-	router := mux.NewRouter()
+
 	router.HandleFunc("/", defaultFunc).Methods("GET").Name("default")
 	router.HandleFunc("/about", aboutFunc).Methods("GET").Name("about")
 
 	router.HandleFunc("/articles/{id:[0-9]+}", articlesShowHandler).Methods("GET").Name("articles.show")
-	router.HandleFunc("/articles", articlesIndexHandler).Methods("GET").Name("articles.index")
-	router.HandleFunc("/articles", articlesStoreHandler).Methods("GET").Name("articles.store")
+	router.HandleFunc("/articles/index", articlesIndexHandler).Methods("GET").Name("articles.index")
+	router.HandleFunc("/articles/store", articlesStoreHandler).Methods("GET").Name("articles.store")
+	router.HandleFunc("/articles/create", articlesCreateHandler).Methods("GET").Name("articles.create")
 
 	router.NotFoundHandler = http.HandlerFunc(notFoundHandler)
 
