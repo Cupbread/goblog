@@ -17,4 +17,5 @@
 .idea/
 .vscode/
 log/
-tmp/
+tmp
+.env
