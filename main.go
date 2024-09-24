@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"goblog/pkg/route"
 	"html/template"
 	"log"
 	"net/http"
@@ -75,7 +76,7 @@ func articlesShowHandler(w http.ResponseWriter, r *http.Request) {
 
 		tmpl, err := template.New("show.gohtml").Funcs(
 			template.FuncMap{
-				"RouteName2URL": RouteName2URL,
+				"RouteName2URL": route.RouteName2URL,
 				"Int64ToString": Int64ToString,
 			}).ParseFiles("resources/views/articles/show.gohtml")
 
@@ -84,15 +85,6 @@ func articlesShowHandler(w http.ResponseWriter, r *http.Request) {
 		err = tmpl.Execute(w, article)
 		checkError(err)
 	}
-}
-
-func RouteName2URL(routeName string, pairs ...string) string {
-	url, err := router.Get(routeName).URL(pairs...)
-	if err != nil {
-		checkError(err)
-		return ""
-	}
-	return url.String()
 }
 
 func Int64ToString(i int64) string {
@@ -489,6 +481,9 @@ func createTables() {
 func main() {
 	initDB()
 	createTables()
+
+	route.Initialize()
+	router = route.Router
 
 	router.HandleFunc("/", homeHandler).Methods("GET").Name("home")
 	router.HandleFunc("/about", aboutHandler).Methods("GET").Name("about")
