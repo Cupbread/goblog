@@ -3,14 +3,19 @@ package main
 import (
 	"goblog/app/http/middlewares"
 	"goblog/bootstrap"
-	"goblog/pkg/logger"
+	"goblog/config"
+	c "goblog/pkg/config"
 	"net/http"
 )
+
+func init() {
+	config.Initialize()
+}
 
 func main() {
 	bootstrap.SetupDB()
 	router := bootstrap.SetupRoute()
 
-	err := http.ListenAndServe(":3000", middlewares.RemoveTrailingSlash(router))
-	logger.LogError(err)
+	http.ListenAndServe(":"+c.GetString("app.port"), middlewares.RemoveTrailingSlash(router))
+
 }
