@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"database/sql"
 	"fmt"
 	"goblog/app/models/article"
 	"goblog/pkg/logger"
@@ -276,7 +275,7 @@ func (*ArticlesController) Delete(w http.ResponseWriter, r *http.Request) {
 	_article, err := article.Get(id)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == gorm.ErrRecordNotFound {
 			w.WriteHeader(http.StatusNotFound)
 			fmt.Fprint(w, "404 page not found")
 		} else {
@@ -288,7 +287,6 @@ func (*ArticlesController) Delete(w http.ResponseWriter, r *http.Request) {
 		rowsAffected, err := _article.Delete()
 
 		if err != nil {
-			logger.LogError(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "服务器内部错误")
 		} else {
