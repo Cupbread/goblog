@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"fmt"
 	"goblog/app/models/article"
 	"goblog/pkg/logger"
@@ -263,6 +264,41 @@ func (*ArticlesController) Update(w http.ResponseWriter, r *http.Request) {
 
 			err = tmpl.Execute(w, data)
 			logger.LogError(err)
+		}
+	}
+}
+
+func (*ArticlesController) Delete(w http.ResponseWriter, r *http.Request) {
+	// 1. 获取 URL 参数
+	id := route.GetRouteVariable("id", r)
+
+	// 2. 读取对应的文章数据
+	_article, err := article.Get(id)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			w.WriteHeader(http.StatusNotFound)
+			fmt.Fprint(w, "404 page not found")
+		} else {
+			logger.LogError(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, "服务器内部错误")
+		}
+	} else {
+		rowsAffected, err := _article.Delete()
+
+		if err != nil {
+			logger.LogError(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, "服务器内部错误")
+		} else {
+			if rowsAffected > 0 {
+				indexURL := route.RouteName2URL("articles.index")
+				http.Redirect(w, r, indexURL, http.StatusFound)
+			} else {
+				w.WriteHeader(http.StatusNotFound)
+				fmt.Fprint(w, "404 page not found")
+			}
 		}
 	}
 }
