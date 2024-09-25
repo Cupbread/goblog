@@ -51,7 +51,7 @@ func Login(_user user.User) {
 	session.Put("uid", _user.GetStringID())
 }
 
-func Logout(_user user.User) {
+func Logout() {
 	session.Forget("uid")
 }
 
