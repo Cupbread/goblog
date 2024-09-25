@@ -26,5 +26,8 @@ func RegisterWebRoutes(r *mux.Router) {
 
 	r.HandleFunc("/articles/{id:[0-9]+}/delete", ac.Delete).Methods("POST").Name("articles.delete")
 
+	r.PathPrefix("/css/").Handler(http.FileServer(http.Dir("./public")))
+	r.PathPrefix("/js/").Handler(http.FileServer(http.Dir("./public")))
+
 	r.Use(middlewares.ForceHTMLMiddleware)
 }
