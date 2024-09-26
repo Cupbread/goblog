@@ -26,14 +26,14 @@ func (*UserController) Show(w http.ResponseWriter, r *http.Request) {
 		} else {
 			logger.LogError(err)
 			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "1.1 500 internal server error")
+			fmt.Fprint(w, "500 internal server error")
 		}
 	} else {
 		articles, err := article.GetByUserID(_user.GetStringID())
 		if err != nil {
 			logger.LogError(err)
 			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "2.1 500 internal server error")
+			fmt.Fprint(w, "500 internal server error")
 		} else {
 			view.Render(w, view.D{
 				"Articles": articles,
