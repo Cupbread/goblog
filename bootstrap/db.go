@@ -14,8 +14,6 @@ func SetupDB() {
 
 	sqlDB, _ := db.DB()
 
-	//defer sqlDB.Close()
-
 	sqlDB.SetMaxOpenConns(config.GetInt("database.mysql.max_open_connections"))
 	// 设置最大空闲连接数
 	sqlDB.SetMaxIdleConns(config.GetInt("database.mysql.max_idle_connections"))

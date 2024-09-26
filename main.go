@@ -15,7 +15,5 @@ func init() {
 func main() {
 	bootstrap.SetupDB()
 	router := bootstrap.SetupRoute()
-
 	http.ListenAndServe(":"+c.GetString("app.port"), middlewares.RemoveTrailingSlash(router))
-
 }
